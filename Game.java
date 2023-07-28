@@ -6,18 +6,18 @@ import java.util.Random;
 import java.util.stream.*;
 
 public class Game {
-    private Tile[][] board;
+    private int[][] board;
     private Random rng;
     private GameState state;
 
     public Game() {
         this.rng = new Random();
-        this.board = new Tile[4][4];
+        this.board = new int[4][4];
         this.state = new GameState();
         initializeBoard();
     }
 
-    public Tile[][] getBoard() {
+    public int[][] getBoard() {
         return this.board;
     }
 
@@ -77,12 +77,12 @@ public class Game {
         for (int row = 0; row < this.board.length; row++) {
             List<Integer> tileValues = new ArrayList<>();
             for (int column = 0; column < this.board.length; column++) {
-                tileValues.add(this.board[row][column].getValue());
+                tileValues.add(this.board[row][column]);
             }
             List<Integer> sortedTileValues = tileValues.stream().sorted(Comparator.comparing(tile -> tile == 0))
                     .collect(Collectors.toList());
             for (int col = 0; col < this.board.length; col++) {
-                this.board[row][col].setValue(sortedTileValues.get(col));
+                this.board[row][col] = sortedTileValues.get(col);
             }
         }
     }
@@ -91,12 +91,12 @@ public class Game {
         for (int row = 0; row < this.board.length; row++) {
             List<Integer> tileValues = new ArrayList<>();
             for (int column = 0; column < this.board.length; column++) {
-                tileValues.add(this.board[row][column].getValue());
+                tileValues.add(this.board[row][column]);
             }
             List<Integer> sortedTileValues = tileValues.stream().sorted(Comparator.comparing(tile -> tile != 0))
                     .collect(Collectors.toList());
             for (int col = 0; col < this.board.length; col++) {
-                this.board[row][col].setValue(sortedTileValues.get(col));
+                this.board[row][col] = sortedTileValues.get(col);
             }
         }
     }
@@ -105,12 +105,12 @@ public class Game {
         for (int column = 0; column < this.board.length; column++) {
             List<Integer> tileValues = new ArrayList<>();
             for (int row = 0; row < this.board.length; row++) {
-                tileValues.add(this.board[row][column].getValue());
+                tileValues.add(this.board[row][column]);
             }
             List<Integer> sortedTileValues = tileValues.stream().sorted(Comparator.comparing(tile -> tile == 0))
                     .collect(Collectors.toList());
             for (int r = 0; r < this.board.length; r++) {
-                this.board[r][column].setValue(sortedTileValues.get(r));
+                this.board[r][column] = sortedTileValues.get(r);
             }
         }
     }
@@ -119,12 +119,12 @@ public class Game {
         for (int column = 0; column < this.board.length; column++) {
             List<Integer> tileValues = new ArrayList<>();
             for (int row = 0; row < this.board.length; row++) {
-                tileValues.add(this.board[row][column].getValue());
+                tileValues.add(this.board[row][column]);
             }
             List<Integer> sortedTileValues = tileValues.stream().sorted(Comparator.comparing(tile -> tile != 0))
                     .collect(Collectors.toList());
             for (int r = 0; r < this.board.length; r++) {
-                this.board[r][column].setValue(sortedTileValues.get(r));
+                this.board[r][column] = sortedTileValues.get(r);
             }
         }
     }
@@ -133,23 +133,23 @@ public class Game {
         for (int row = 0; row < this.board.length; row++) {
             List<Integer> tileValues = new ArrayList<>();
             for (int column = 0; column < this.board.length - 1; column++) {
-                if (this.board[row][column].getValue() == this.board[row][column + 1].getValue()) {
-                    tileValues.add(this.board[row][column].getValue() * 2);
+                if (this.board[row][column] == this.board[row][column + 1]) {
+                    tileValues.add(this.board[row][column] * 2);
                     tileValues.add(0);
                     column++;
                 } else {
-                    tileValues.add(this.board[row][column].getValue());
+                    tileValues.add(this.board[row][column]);
                 }
             }
-            if (this.board[row][2].getValue() != this.board[row][3].getValue())
-                tileValues.add(this.board[row][3].getValue());
+            if (this.board[row][2] != this.board[row][3])
+                tileValues.add(this.board[row][3]);
 
             while (tileValues.size() < 4) {
                 tileValues.add(0);
             }
 
             for (int col = 0; col < this.board.length; col++) {
-                this.board[row][col].setValue(tileValues.get(col));
+                this.board[row][col] = tileValues.get(col);
             }
         }
     }
@@ -158,17 +158,17 @@ public class Game {
         for (int row = 0; row < this.board.length; row++) {
             List<Integer> tileValues = new ArrayList<>();
             for (int column = this.board.length - 1; column > 0; column--) {
-                if (this.board[row][column].getValue() == this.board[row][column - 1].getValue()) {
-                    tileValues.add(this.board[row][column].getValue() * 2);
+                if (this.board[row][column] == this.board[row][column - 1]) {
+                    tileValues.add(this.board[row][column] * 2);
                     tileValues.add(0);
                     column--;
                 } else {
-                    tileValues.add(this.board[row][column].getValue());
+                    tileValues.add(this.board[row][column]);
                 }
             }
 
-            if (this.board[row][0].getValue() != this.board[row][1].getValue())
-                tileValues.add(this.board[row][0].getValue());
+            if (this.board[row][0] != this.board[row][1])
+                tileValues.add(this.board[row][0]);
 
             while (tileValues.size() < 4) {
                 tileValues.add(0);
@@ -177,7 +177,7 @@ public class Game {
             Collections.reverse(tileValues);
 
             for (int col = 0; col < this.board.length; col++) {
-                this.board[row][col].setValue(tileValues.get(col));
+                this.board[row][col] = tileValues.get(col);
             }
         }
     }
@@ -186,24 +186,24 @@ public class Game {
         for (int column = 0; column < this.board.length; column++) {
             List<Integer> tileValues = new ArrayList<>();
             for (int row = 0; row < this.board.length - 1; row++) {
-                if (this.board[row][column].getValue() == this.board[row + 1][column].getValue()) {
-                    tileValues.add(this.board[row][column].getValue() * 2);
+                if (this.board[row][column] == this.board[row + 1][column]) {
+                    tileValues.add(this.board[row][column] * 2);
                     tileValues.add(0);
                     row++;
                 } else {
-                    tileValues.add(this.board[row][column].getValue());
+                    tileValues.add(this.board[row][column]);
                 }
             }
 
-            if (this.board[2][column].getValue() != this.board[3][column].getValue())
-                tileValues.add(this.board[3][column].getValue());
+            if (this.board[2][column] != this.board[3][column])
+                tileValues.add(this.board[3][column]);
 
             while (tileValues.size() < 4) {
                 tileValues.add(0);
             }
 
             for (int r = 0; r < this.board.length; r++) {
-                this.board[r][column].setValue(tileValues.get(r));
+                this.board[r][column] = tileValues.get(r);
             }
         }
     }
@@ -212,26 +212,27 @@ public class Game {
         for (int column = 0; column < this.board.length; column++) {
             List<Integer> tileValues = new ArrayList<>();
             for (int row = this.board.length - 1; row > 0; row--) {
-                if (this.board[row][column].getValue() == this.board[row - 1][column].getValue()) {
-                    tileValues.add(this.board[row][column].getValue() * 2);
+                if (this.board[row][column] == this.board[row - 1][column]) {
+                    tileValues.add(this.board[row][column] * 2);
                     tileValues.add(0);
                     row--;
                 } else {
-                    tileValues.add(this.board[row][column].getValue());
+                    tileValues.add(this.board[row][column]);
                 }
             }
 
-            if (this.board[0][column].getValue() != this.board[1][column].getValue())
-                tileValues.add(this.board[0][column].getValue());
+            if (this.board[0][column] != this.board[1][column])
+                tileValues.add(this.board[0][column]);
 
             while (tileValues.size() < 4) {
                 tileValues.add(0);
             }
 
-            Collections.reverse(tileValues);
+            Collections.reverse(tileValues); // probably don't need this, can just reverse the index of the for loop on
+                                             // the next line.
 
             for (int r = 0; r < this.board.length; r++) {
-                this.board[r][column].setValue(tileValues.get(r));
+                this.board[r][column] = tileValues.get(r);
             }
         }
     }
@@ -239,7 +240,7 @@ public class Game {
     private void initializeBoard() {
         for (int row = 0; row < this.board.length; row++) {
             for (int column = 0; column < this.board.length; column++) {
-                this.board[row][column] = new Tile();
+                this.board[row][column] = 0;
             }
         }
         placeNewTile();
@@ -254,7 +255,7 @@ public class Game {
             targetRow = rng.nextInt(this.board.length);
             targetColumn = rng.nextInt(this.board.length);
 
-            if (this.board[targetRow][targetColumn].getValue() == 0) {
+            if (this.board[targetRow][targetColumn] == 0) {
                 validTarget = true;
             }
         }
@@ -265,13 +266,13 @@ public class Game {
         } else {
             value = 4;
         }
-        this.board[targetRow][targetColumn].setValue(value);
+        this.board[targetRow][targetColumn] = value;
     }
 
     private boolean isBoardFull() {
         for (int row = 0; row < this.board.length; row++) {
             for (int column = 0; column < this.board.length; column++) {
-                if (this.board[row][column].getValue() == 0) {
+                if (this.board[row][column] == 0) {
                     return false;
                 }
             }

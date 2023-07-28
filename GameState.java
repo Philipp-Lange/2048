@@ -19,10 +19,10 @@ public class GameState {
         }
     }
 
-    public boolean isGameWon(Tile[][] board) {
+    public boolean isGameWon(int[][] board) {
         for (int row = 0; row < board.length; row++) {
             for (int column = 0; column < board.length; column++) {
-                if (board[row][column].getValue() == 2048) {
+                if (board[row][column] == 2048) {
                     return true;
                 }
             }

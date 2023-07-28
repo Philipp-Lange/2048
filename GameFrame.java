@@ -86,12 +86,12 @@ public class GameFrame extends JFrame implements KeyListener {
     }
 
     private void renderBoard() {
-        Tile[][] board = this.game.getBoard();
+        int[][] board = this.game.getBoard();
         for (int row = 0; row < board.length; row++) {
             for (int column = 0; column < board.length; column++) {
-                this.tiles[column][row].setIcon(this.sprites.get(board[row][column].getValue())); // no idea why I need
-                                                                                                  // [column][row] and
-                                                                                                  // then [row][column]
+                this.tiles[column][row].setIcon(this.sprites.get(board[row][column])); // no idea why I need
+                                                                                       // [column][row] and
+                                                                                       // then [row][column]
             }
         }
     }
