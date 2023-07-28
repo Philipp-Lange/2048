@@ -29,4 +29,11 @@ public class GameState {
         }
         return false;
     }
+
+    public void reset() {
+        this.canMoveRight = true;
+        this.canMoveLeft = true;
+        this.canMoveDown = true;
+        this.canMoveUp = true;
+    }
 }
