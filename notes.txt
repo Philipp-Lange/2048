@@ -1,0 +1,27 @@
+    private void mergeRight() {
+        for (int row = 0; row < this.board.length; row++) {
+            List<Integer> tileValues = new ArrayList<>();
+            for (int column = this.board.length - 1; column > 0; column--) {
+                if (this.board[row][column].getValue() == this.board[row][column - 1].getValue()) {
+                    tileValues.add(this.board[row][column].getValue() * 2);
+                    tileValues.add(0);
+                    column--;
+                } else {
+                    tileValues.add(this.board[row][column].getValue());
+                }
+            }
+
+            if (this.board[row][0].getValue() != this.board[row][1].getValue())
+                tileValues.add(this.board[row][0].getValue());
+
+            while (tileValues.size() < 4) {
+                tileValues.add(0);
+            }
+
+            Collections.reverse(tileValues);
+
+            for (int col = 0; col < this.board.length; col++) {
+                this.board[row][col].setValue(tileValues.get(col));
+            }
+        }
+    }
