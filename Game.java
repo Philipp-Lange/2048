@@ -7,13 +7,14 @@ import java.util.Random;
 import java.util.stream.*;
 
 public class Game {
-    private int[][] board = { { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } };
+    private int[][] board;
     private Random rng;
     private GameState state;
 
     public Game() {
         this.rng = new Random();
         this.state = new GameState();
+        this.board = new int[4][4];
 
         initializeBoard(this.board);
     }
@@ -87,6 +88,15 @@ public class Game {
 
     public boolean isGameWon() {
         return this.state.isGameWon(this.board);
+    }
+
+    public void reset() {
+        initializeBoard(this.board);
+        this.state.reset();
+    }
+
+    public void setWinCondition() {
+        this.board[0][0] = 2048;
     }
 
     private void compactLeft(int[][] board) {
@@ -254,6 +264,11 @@ public class Game {
     }
 
     private void initializeBoard(int[][] board) {
+        for (int row = 0; row < board.length; row++) {
+            for (int col = 0; col < board.length; col++) {
+                board[row][col] = 0;
+            }
+        }
         placeNewTile(board);
         placeNewTile(board);
     }

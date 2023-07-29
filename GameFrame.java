@@ -5,16 +5,19 @@ import java.util.Map;
 
 public class GameFrame extends JFrame implements KeyListener {
     private Game game;
+    private boolean gameIsOver;
     private Map<Integer, ImageIcon> sprites;
     private JLabel[][] tiles;
     private JLabel endScreen;
     private ImageIcon gameOverImage;
     private ImageIcon gameWonImage;
+    private ImageIcon hiddenImage;
 
     public GameFrame(Game game) {
         this.game = game;
         this.tiles = new JLabel[4][4];
         this.sprites = new HashMap<Integer, ImageIcon>();
+        this.gameIsOver = false;
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(495, 520);
@@ -31,17 +34,13 @@ public class GameFrame extends JFrame implements KeyListener {
         this.setVisible(true);
 
         while (true) {
-            renderBoard();
-            if (this.game.isGameOver() || this.game.isGameWon()) {
-                break;
+            while (!gameIsOver) {
+                renderBoard();
+                if (this.game.isGameOver() || this.game.isGameWon()) {
+                    gameIsOver = true;
+                    break;
+                }
             }
-        }
-        if (this.game.isGameOver()) {
-            this.endScreen.setIcon(gameOverImage);
-        }
-
-        if (this.game.isGameWon()) {
-            this.endScreen.setIcon(gameWonImage);
         }
     }
 
@@ -60,17 +59,27 @@ public class GameFrame extends JFrame implements KeyListener {
             case 'd':
                 this.game.moveRight();
                 break;
+            case 'p':
+                this.game.setWinCondition();
+                break;
         }
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        return;
+        switch (e.getKeyCode()) {
+            case 32:
+                if (!this.gameIsOver) {
+                    break;
+                }
+                this.game.reset();
+                this.gameIsOver = false;
+                break;
+        }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        return;
     }
 
     private void initializeBoard() {
@@ -89,10 +98,16 @@ public class GameFrame extends JFrame implements KeyListener {
         int[][] board = this.game.getBoard();
         for (int row = 0; row < board.length; row++) {
             for (int column = 0; column < board.length; column++) {
-                this.tiles[column][row].setIcon(this.sprites.get(board[row][column])); // no idea why I need
-                                                                                       // [column][row] and
-                                                                                       // then [row][column]
+                this.tiles[column][row].setIcon(this.sprites.get(board[row][column]));
+                // no idea why I need [column][row] and then [row][column]
             }
+        }
+        this.endScreen.setIcon(this.hiddenImage);
+        if (this.game.isGameOver()) {
+            this.endScreen.setIcon(this.gameOverImage);
+        }
+        if (this.game.isGameWon()) {
+            this.endScreen.setIcon(this.gameWonImage);
         }
     }
 
@@ -111,6 +126,7 @@ public class GameFrame extends JFrame implements KeyListener {
         this.sprites.put(2048, new ImageIcon("GameImages/2048.png"));
         this.gameOverImage = new ImageIcon("GameImages/game-over.png");
         this.gameWonImage = new ImageIcon("GameImages/game-won.png");
+        this.hiddenImage = new ImageIcon("GameImages/hidden.png");
     }
 
 }
