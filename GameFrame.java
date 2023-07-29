@@ -60,7 +60,7 @@ public class GameFrame extends JFrame implements KeyListener {
                 this.game.moveRight();
                 break;
             case 'p':
-                this.game.setWinCondition();
+                this.game.setTestCondition();
                 break;
         }
     }

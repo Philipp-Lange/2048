@@ -1,18 +1,19 @@
-    private void mergeRight() {
-        for (int row = 0; row < this.board.length; row++) {
+old merge right
+
+    private void mergeRight(int[][] board) {
+        for (int row = 0; row < board.length; row++) {
             List<Integer> tileValues = new ArrayList<>();
-            for (int column = this.board.length - 1; column > 0; column--) {
-                if (this.board[row][column].getValue() == this.board[row][column - 1].getValue()) {
-                    tileValues.add(this.board[row][column].getValue() * 2);
-                    tileValues.add(0);
-                    column--;
+            for (int column = board.length - 1; column > 0; column--) {
+                if (board[row][column] == board[row][column - 1]) {
+                    tileValues.add(board[row][column] * 2);
+                    board[row][column - 1] = 0;
                 } else {
-                    tileValues.add(this.board[row][column].getValue());
+                    tileValues.add(board[row][column]);
                 }
             }
 
-            if (this.board[row][0].getValue() != this.board[row][1].getValue())
-                tileValues.add(this.board[row][0].getValue());
+            if (board[row][0] != board[row][1])
+                tileValues.add(board[row][0]);
 
             while (tileValues.size() < 4) {
                 tileValues.add(0);
@@ -20,8 +21,8 @@
 
             Collections.reverse(tileValues);
 
-            for (int col = 0; col < this.board.length; col++) {
-                this.board[row][col].setValue(tileValues.get(col));
+            for (int col = 0; col < board.length; col++) {
+                board[row][col] = tileValues.get(col);
             }
         }
     }

@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
@@ -95,8 +94,12 @@ public class Game {
         this.state.reset();
     }
 
-    public void setWinCondition() {
-        this.board[0][0] = 2048;
+    public void setTestCondition() {
+        this.board[0][0] = 4;
+        this.board[1][0] = 4;
+        this.board[2][0] = 4;
+        this.board[3][0] = 8;
+
     }
 
     private void compactLeft(int[][] board) {
@@ -157,108 +160,44 @@ public class Game {
 
     private void mergeLeft(int[][] board) {
         for (int row = 0; row < board.length; row++) {
-            List<Integer> tileValues = new ArrayList<>();
             for (int column = 0; column < board.length - 1; column++) {
                 if (board[row][column] == board[row][column + 1]) {
-                    tileValues.add(board[row][column] * 2);
-                    tileValues.add(0);
-                    column++;
-                } else {
-                    tileValues.add(board[row][column]);
+                    board[row][column] *= 2;
+                    board[row][column + 1] = 0;
                 }
-            }
-            if (board[row][2] != board[row][3])
-                tileValues.add(board[row][3]);
-
-            while (tileValues.size() < 4) {
-                tileValues.add(0);
-            }
-
-            for (int col = 0; col < board.length; col++) {
-                board[row][col] = tileValues.get(col);
             }
         }
     }
 
     private void mergeRight(int[][] board) {
         for (int row = 0; row < board.length; row++) {
-            List<Integer> tileValues = new ArrayList<>();
             for (int column = board.length - 1; column > 0; column--) {
                 if (board[row][column] == board[row][column - 1]) {
-                    tileValues.add(board[row][column] * 2);
-                    tileValues.add(0);
-                    column--;
-                } else {
-                    tileValues.add(board[row][column]);
+                    board[row][column] *= 2;
+                    board[row][column - 1] = 0;
                 }
-            }
-
-            if (board[row][0] != board[row][1])
-                tileValues.add(board[row][0]);
-
-            while (tileValues.size() < 4) {
-                tileValues.add(0);
-            }
-
-            Collections.reverse(tileValues);
-
-            for (int col = 0; col < board.length; col++) {
-                board[row][col] = tileValues.get(col);
             }
         }
     }
 
     private void mergeUp(int[][] board) {
         for (int column = 0; column < board.length; column++) {
-            List<Integer> tileValues = new ArrayList<>();
             for (int row = 0; row < board.length - 1; row++) {
                 if (board[row][column] == board[row + 1][column]) {
-                    tileValues.add(board[row][column] * 2);
-                    tileValues.add(0);
-                    row++;
-                } else {
-                    tileValues.add(board[row][column]);
+                    board[row][column] *= 2;
+                    board[row + 1][column] = 0;
                 }
-            }
-
-            if (board[2][column] != board[3][column])
-                tileValues.add(board[3][column]);
-
-            while (tileValues.size() < 4) {
-                tileValues.add(0);
-            }
-
-            for (int r = 0; r < board.length; r++) {
-                board[r][column] = tileValues.get(r);
             }
         }
     }
 
     private void mergeDown(int[][] board) {
         for (int column = 0; column < board.length; column++) {
-            List<Integer> tileValues = new ArrayList<>();
             for (int row = board.length - 1; row > 0; row--) {
                 if (board[row][column] == board[row - 1][column]) {
-                    tileValues.add(board[row][column] * 2);
-                    tileValues.add(0);
-                    row--;
-                } else {
-                    tileValues.add(board[row][column]);
+                    board[row][column] *= 2;
+                    board[row - 1][column] = 0;
                 }
-            }
-
-            if (board[0][column] != board[1][column])
-                tileValues.add(board[0][column]);
-
-            while (tileValues.size() < 4) {
-                tileValues.add(0);
-            }
-
-            Collections.reverse(tileValues); // probably don't need this, can just reverse the index of the for loop on
-                                             // the next line.
-
-            for (int r = 0; r < board.length; r++) {
-                board[r][column] = tileValues.get(r);
             }
         }
     }
