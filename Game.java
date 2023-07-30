@@ -79,6 +79,7 @@ public class Game {
             state.canMoveUp = false;
         }
         copyBoardValues(newBoard, this.board);
+        // maybe track high score by comparing old to new board.
     }
 
     public boolean isGameOver() {
@@ -95,11 +96,7 @@ public class Game {
     }
 
     public void setTestCondition() {
-        this.board[0][0] = 4;
-        this.board[1][0] = 4;
-        this.board[2][0] = 4;
-        this.board[3][0] = 8;
-
+        this.board[0][0] = 2048;
     }
 
     private void compactLeft(int[][] board) {
