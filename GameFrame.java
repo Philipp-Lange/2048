@@ -46,22 +46,9 @@ public class GameFrame extends JFrame implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-        switch (e.getKeyChar()) {
-            case 'w':
-                this.game.moveUp();
-                break;
-            case 'a':
-                this.game.moveLeft();
-                break;
-            case 's':
-                this.game.moveDown();
-                break;
-            case 'd':
-                this.game.moveRight();
-                break;
-            case 'p':
-                this.game.setTestCondition();
-                break;
+        char key = e.getKeyChar();
+        if ("wasdop".indexOf(key) != -1) {
+            this.game.changeBoard(key);
         }
     }
 
