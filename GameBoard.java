@@ -25,8 +25,8 @@ public class GameBoard {
 
     public int[][] setValues() {
         int[][] newValues = new int[4][4];
-        for (int column = 0; column < newValues.length; column++) {
-            for (int row = newValues.length - 1; row > 0; row--) {
+        for (int row = 0; row < newValues.length; row++) {
+            for (int column = 0; column < newValues.length; column++) {
                 newValues[row][column] = 0;
             }
         }
@@ -35,38 +35,39 @@ public class GameBoard {
 
     public int[][] setValues(GameBoard board) {
         int[][] newValues = new int[4][4];
-        for (int column = 0; column < newValues.length; column++) {
-            for (int row = newValues.length - 1; row > 0; row--) {
+        for (int row = 0; row < newValues.length; row++) {
+            for (int column = 0; column < newValues.length; column++) {
                 newValues[row][column] = board.getValues()[row][column];
             }
         }
         return newValues;
     }
 
-    public GameBoard moveGameBoard(String direction) {
+    public int moveGameBoard(String direction) {
+        int score = 0;
         switch (direction) {
             case "up":
                 this.compactUp(this.values);
-                this.mergeUp(this.values);
+                score += this.mergeUp(this.values);
                 this.compactUp(this.values);
                 break;
             case "left":
                 this.compactLeft(this.values);
-                this.mergeLeft(this.values);
+                score += this.mergeLeft(this.values);
                 this.compactLeft(this.values);
                 break;
             case "down":
                 this.compactDown(this.values);
-                this.mergeDown(this.values);
+                score += this.mergeDown(this.values);
                 this.compactDown(this.values);
                 break;
             case "right":
                 this.compactRight(this.values);
-                this.mergeRight(this.values);
+                score += this.mergeRight(this.values);
                 this.compactRight(this.values);
                 break;
         }
-        return this;
+        return score;
 
     }
 
@@ -179,48 +180,60 @@ public class GameBoard {
         }
     }
 
-    private void mergeLeft(int[][] board) {
+    private int mergeLeft(int[][] board) {
+        int score = 0;
         for (int row = 0; row < board.length; row++) {
             for (int column = 0; column < board.length - 1; column++) {
                 if (board[row][column] == board[row][column + 1]) {
                     board[row][column] *= 2;
                     board[row][column + 1] = 0;
+                    score += board[row][column];
                 }
             }
         }
+        return score;
     }
 
-    private void mergeRight(int[][] board) {
+    private int mergeRight(int[][] board) {
+        int score = 0;
         for (int row = 0; row < board.length; row++) {
             for (int column = board.length - 1; column > 0; column--) {
                 if (board[row][column] == board[row][column - 1]) {
                     board[row][column] *= 2;
                     board[row][column - 1] = 0;
+                    score += board[row][column];
                 }
             }
         }
+        return score;
     }
 
-    private void mergeUp(int[][] board) {
+    private int mergeUp(int[][] board) {
+        int score = 0;
         for (int column = 0; column < board.length; column++) {
             for (int row = 0; row < board.length - 1; row++) {
                 if (board[row][column] == board[row + 1][column]) {
                     board[row][column] *= 2;
                     board[row + 1][column] = 0;
+                    score += board[row][column];
                 }
             }
         }
+        return score;
     }
 
-    private void mergeDown(int[][] board) {
+    private int mergeDown(int[][] board) {
+        int score = 0;
         for (int column = 0; column < board.length; column++) {
             for (int row = board.length - 1; row > 0; row--) {
                 if (board[row][column] == board[row - 1][column]) {
                     board[row][column] *= 2;
                     board[row - 1][column] = 0;
+                    score += board[row][column];
                 }
             }
         }
+        return score;
     }
 
 }

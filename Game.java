@@ -1,278 +1,159 @@
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
-import java.util.stream.*;
 
 public class Game {
-    private int[][] board;
-    private Random rng;
-    private GameState state;
-    private Map<Integer, int[][]> boardHistory;
-    private int boardHistoryIndex;
+    private GameBoard board;
+    private StateChecker stateChecker;
+    private Map<Integer, GameBoard> history;
+    private List<Integer> scoreHistory;
+    private Map<Character, String> keyBinds;
+    private int historyIndex;
+    private int scoreHistoryIndex;
+    private int score;
 
     public Game() {
-        this.rng = new Random();
-        this.state = new GameState();
-        this.board = new int[4][4];
-        this.boardHistory = new HashMap<>();
-        this.boardHistoryIndex = -1;
+        this.stateChecker = new StateChecker();
+        this.board = new GameBoard();
+        this.board.placeNewValue();
+        this.board.placeNewValue();
 
-        initializeBoard(this.board);
-        addBoardToHistory(this.board);
+        this.history = new HashMap<>();
+        this.historyIndex = -1;
+        this.scoreHistory = new ArrayList<>();
+        this.scoreHistoryIndex = -1;
+
+        this.keyBinds = new HashMap<>();
+        this.setKeyBinds();
+
+        this.score = 0;
+        this.addToBoardHistory(this.board);
+        this.addToScoreHistory(this.score);
     }
 
     public int[][] getBoard() {
-        return this.board;
+        return this.board.getValues();
     }
 
-    public void changeBoard(char keyPressed) {
-        int[][] newBoard = new int[4][4];
-        boolean wasAMove = true;
-        copyBoardValues(this.board, newBoard);
+    public void move(char keyPressed) {
+        GameBoard newBoard = new GameBoard(this.board);
+        this.score += newBoard.moveGameBoard(this.keyBinds.get(keyPressed));
 
-        switch (keyPressed) {
-            case 'w':
-                this.compactUp(newBoard);
-                this.mergeUp(newBoard);
-                this.compactUp(newBoard);
-                break;
-            case 'a':
-                this.compactLeft(newBoard);
-                this.mergeLeft(newBoard);
-                this.compactLeft(newBoard);
-                break;
-            case 's':
-                this.compactDown(newBoard);
-                this.mergeDown(newBoard);
-                this.compactDown(newBoard);
-                break;
-            case 'd':
-                this.compactRight(newBoard);
-                this.mergeRight(newBoard);
-                this.compactRight(newBoard);
-                break;
-            case 'o':
-                if (this.boardHistoryIndex >= 0) {
-                    newBoard = this.undoMove(this.boardHistory);
-                    wasAMove = false;
-                }
-                break;
-            case 'p':
-                if (this.boardHistoryIndex < this.boardHistory.size() - 1) {
-                    newBoard = this.redoMove(this.boardHistory);
-                    wasAMove = false;
-                }
-                break;
+        // Note sure if this should be nested if statements or seperate.
+        // I feel like seperate is more readable.
 
+        if (!newBoard.equals(this.board)) {
+            addToBoardHistory(newBoard);
+            addToScoreHistory(this.score);
         }
 
-        if (!this.isBoardFull() && !Arrays.deepEquals(newBoard, this.board) && wasAMove) {
-            this.placeNewTile(newBoard);
-            this.state.reset();
-            addBoardToHistory(newBoard);
-        } else {
-            this.state.canMoveRight = false;
+        if (!newBoard.isBoardFull() && !newBoard.equals(this.board)) {
+            newBoard.placeNewValue();
         }
-        copyBoardValues(newBoard, this.board);
+
+        this.board = newBoard;
     }
 
-    public boolean isGameOver() {
-        return this.state.isGameOver();
+    public void undo() {
+        this.board = this.undoMove(this.history);
+        this.score = this.undoScore(this.scoreHistory);
+        System.out.println("Board Index: " + this.historyIndex);
+        System.out.println("Score Index: " + this.scoreHistoryIndex);
     }
 
-    public boolean isGameWon() {
-        return this.state.isGameWon(this.board);
+    public void redo() {
+        this.board = this.redoMove(this.history);
+        this.score = this.redoScore(this.scoreHistory);
+        System.out.println("Board Index: " + this.historyIndex);
+        System.out.println("Score Index: " + this.scoreHistoryIndex);
+    }
+
+    public State getState() {
+        return stateChecker.getState(this.board);
+    }
+
+    public int getScore() {
+        return this.score;
     }
 
     public void reset() {
-        initializeBoard(this.board);
-        this.state.reset();
+        this.board = new GameBoard();
+        this.board.placeNewValue();
+        this.board.placeNewValue();
+        this.history.clear();
+        this.scoreHistory.clear();
+        this.score = 0;
+        this.historyIndex = 0;
+        this.scoreHistoryIndex = 0;
     }
 
     public void setTestCondition() {
-        this.board[0][0] = 2048;
-    }
-
-    private void addBoardToHistory(int[][] board) {
-        int index = this.boardHistory.size() - 1;
-        while (this.boardHistoryIndex < index) {
-            this.boardHistory.remove(index);
-            index--;
-        }
-        this.boardHistoryIndex++;
-        int[][] newBoard = new int[4][4];
-        copyBoardValues(board, newBoard);
-        this.boardHistory.put(this.boardHistoryIndex, newBoard);
-    }
-
-    private int[][] undoMove(Map<Integer, int[][]> boardHistory) {
-        this.boardHistoryIndex--;
-        if (this.boardHistoryIndex <= 0) {
-            this.boardHistoryIndex = 0;
-        }
-        return boardHistory.get(this.boardHistoryIndex);
-    }
-
-    private int[][] redoMove(Map<Integer, int[][]> boardHistory) {
-        this.boardHistoryIndex++;
-        if (this.boardHistoryIndex >= boardHistory.size() - 1) {
-            this.boardHistoryIndex = boardHistory.size() - 1;
-        }
-        return boardHistory.get(this.boardHistoryIndex);
-    }
-
-    private void compactLeft(int[][] board) {
-        for (int row = 0; row < board.length; row++) {
-            List<Integer> tileValues = new ArrayList<>();
-            for (int column = 0; column < board.length; column++) {
-                tileValues.add(board[row][column]);
-            }
-            List<Integer> sortedTileValues = tileValues.stream().sorted(Comparator.comparing(tile -> tile == 0))
-                    .collect(Collectors.toList());
-            for (int col = 0; col < board.length; col++) {
-                board[row][col] = sortedTileValues.get(col);
+        int[][] testBoard = { { 4, 8, 4, 2 }, { 16, 64, 128, 8 }, { 2, 16, 64, 16 }, { 2, 4, 8, 2 } };
+        for (int row = 0; row < 4; row++) {
+            for (int column = 0; column < 4; column++) {
+                this.board.getValues()[row][column] = testBoard[row][column];
             }
         }
     }
 
-    private void compactRight(int[][] board) {
-        for (int row = 0; row < board.length; row++) {
-            List<Integer> tileValues = new ArrayList<>();
-            for (int column = 0; column < board.length; column++) {
-                tileValues.add(board[row][column]);
-            }
-            List<Integer> sortedTileValues = tileValues.stream().sorted(Comparator.comparing(tile -> tile != 0))
-                    .collect(Collectors.toList());
-            for (int col = 0; col < board.length; col++) {
-                board[row][col] = sortedTileValues.get(col);
-            }
+    private void addToBoardHistory(GameBoard newBoard) {
+        int historySize = this.history.size() - 1;
+        while (this.historyIndex < historySize) {
+            this.history.remove(historySize);
+            historySize--;
         }
+        this.historyIndex++;
+        this.history.put(this.historyIndex, newBoard);
     }
 
-    private void compactUp(int[][] board) {
-        for (int column = 0; column < board.length; column++) {
-            List<Integer> tileValues = new ArrayList<>();
-            for (int row = 0; row < board.length; row++) {
-                tileValues.add(board[row][column]);
-            }
-            List<Integer> sortedTileValues = tileValues.stream().sorted(Comparator.comparing(tile -> tile == 0))
-                    .collect(Collectors.toList());
-            for (int r = 0; r < board.length; r++) {
-                board[r][column] = sortedTileValues.get(r);
-            }
+    private void addToScoreHistory(int score) {
+        int historySize = this.scoreHistory.size() - 1;
+        while (this.scoreHistoryIndex < historySize) {
+            this.scoreHistory.remove(historySize);
+            historySize--;
         }
+        this.scoreHistoryIndex++;
+        this.scoreHistory.add(score);
     }
 
-    private void compactDown(int[][] board) {
-        for (int column = 0; column < board.length; column++) {
-            List<Integer> tileValues = new ArrayList<>();
-            for (int row = 0; row < board.length; row++) {
-                tileValues.add(board[row][column]);
-            }
-            List<Integer> sortedTileValues = tileValues.stream().sorted(Comparator.comparing(tile -> tile != 0))
-                    .collect(Collectors.toList());
-            for (int r = 0; r < board.length; r++) {
-                board[r][column] = sortedTileValues.get(r);
-            }
+    private GameBoard undoMove(Map<Integer, GameBoard> history) {
+        if (this.historyIndex > 0) {
+            this.historyIndex--;
+            return history.get(this.historyIndex);
         }
+        return this.board;
     }
 
-    private void mergeLeft(int[][] board) {
-        for (int row = 0; row < board.length; row++) {
-            for (int column = 0; column < board.length - 1; column++) {
-                if (board[row][column] == board[row][column + 1]) {
-                    board[row][column] *= 2;
-                    board[row][column + 1] = 0;
-                }
-            }
+    private GameBoard redoMove(Map<Integer, GameBoard> history) {
+        if (this.historyIndex < history.size() - 1) {
+            this.historyIndex++;
+            return history.get(this.historyIndex);
         }
+        return this.board;
     }
 
-    private void mergeRight(int[][] board) {
-        for (int row = 0; row < board.length; row++) {
-            for (int column = board.length - 1; column > 0; column--) {
-                if (board[row][column] == board[row][column - 1]) {
-                    board[row][column] *= 2;
-                    board[row][column - 1] = 0;
-                }
-            }
+    private int undoScore(List<Integer> history) {
+        if (this.scoreHistoryIndex > 0) {
+            this.scoreHistoryIndex--;
+            return history.get(this.scoreHistoryIndex);
         }
+        return this.score;
     }
 
-    private void mergeUp(int[][] board) {
-        for (int column = 0; column < board.length; column++) {
-            for (int row = 0; row < board.length - 1; row++) {
-                if (board[row][column] == board[row + 1][column]) {
-                    board[row][column] *= 2;
-                    board[row + 1][column] = 0;
-                }
-            }
+    private int redoScore(List<Integer> history) {
+        if (this.scoreHistoryIndex < scoreHistory.size() - 1) {
+            this.scoreHistoryIndex++;
+            return history.get(this.scoreHistoryIndex);
         }
+        return this.score;
     }
 
-    private void mergeDown(int[][] board) {
-        for (int column = 0; column < board.length; column++) {
-            for (int row = board.length - 1; row > 0; row--) {
-                if (board[row][column] == board[row - 1][column]) {
-                    board[row][column] *= 2;
-                    board[row - 1][column] = 0;
-                }
-            }
-        }
-    }
-
-    private void initializeBoard(int[][] board) {
-        for (int row = 0; row < board.length; row++) {
-            for (int col = 0; col < board.length; col++) {
-                board[row][col] = 0;
-            }
-        }
-        placeNewTile(board);
-        placeNewTile(board);
-    }
-
-    private void placeNewTile(int[][] board) {
-        boolean validTarget = false;
-        int targetRow = -1;
-        int targetColumn = -1;
-        while (!validTarget) {
-            targetRow = rng.nextInt(board.length);
-            targetColumn = rng.nextInt(board.length);
-
-            if (board[targetRow][targetColumn] == 0) {
-                validTarget = true;
-            }
-        }
-        int decider = rng.nextInt(100);
-        int value = 0;
-        if (decider < 90) {
-            value = 2;
-        } else {
-            value = 4;
-        }
-        board[targetRow][targetColumn] = value;
-    }
-
-    private boolean isBoardFull() {
-        for (int row = 0; row < this.board.length; row++) {
-            for (int column = 0; column < this.board.length; column++) {
-                if (this.board[row][column] == 0) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    private void copyBoardValues(int[][] boardToCopy, int[][] target) {
-        for (int row = 0; row < boardToCopy.length; row++) {
-            for (int col = 0; col < boardToCopy.length; col++) {
-                target[row][col] = boardToCopy[row][col];
-            }
-        }
+    private void setKeyBinds() {
+        // in future should allow custom key bindings
+        this.keyBinds.put('w', "up");
+        this.keyBinds.put('a', "left");
+        this.keyBinds.put('s', "down");
+        this.keyBinds.put('d', "right");
     }
 }

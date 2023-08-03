@@ -1,16 +1,18 @@
 public class StateChecker {
+    private State state;
 
     public StateChecker() {
     }
 
-    public String getState(GameBoard gameBoard) {
+    public State getState(GameBoard gameBoard) {
         if (this.gameWon(gameBoard)) {
-            return "won";
+            state = State.WON;
         } else if (this.gameOver(gameBoard)) {
-            return "gameover";
+            state = State.GAMEOVER;
         } else {
-            return "playing";
+            state = State.PLAYING;
         }
+        return state;
     }
 
     private boolean gameWon(GameBoard gameBoard) {
@@ -26,7 +28,10 @@ public class StateChecker {
     }
 
     private boolean gameOver(GameBoard gameBoard) {
-        GameBoard newBoard = new GameBoard();
+        GameBoard newBoard = new GameBoard(gameBoard);
+        if (!newBoard.isBoardFull()) {
+            return false;
+        }
         newBoard.moveGameBoard("up");
         newBoard.moveGameBoard("down");
         newBoard.moveGameBoard("left");

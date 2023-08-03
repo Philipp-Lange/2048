@@ -9,6 +9,8 @@ public class GameFrame extends JFrame implements KeyListener {
     private Map<Integer, ImageIcon> sprites;
     private JLabel[][] tiles;
     private JLabel endScreen;
+    private JLabel highScore;
+    private JLabel currentScore;
     private ImageIcon gameOverImage;
     private ImageIcon gameWonImage;
     private ImageIcon hiddenImage;
@@ -29,26 +31,34 @@ public class GameFrame extends JFrame implements KeyListener {
         this.endScreen.setBounds(90, 90, 300, 300);
         this.add(this.endScreen);
 
+        this.highScore = new JLabel("High Score: 133742069");
+        this.highScore.setBounds(25, 5, 150, 15);
+        this.add(this.highScore);
+
+        this.currentScore = new JLabel("Current Score: 0", SwingConstants.RIGHT);
+        this.currentScore.setBounds(305, 5, 150, 15);
+        this.add(this.currentScore);
+
         initializeBoard();
         intializeSprites();
         this.setVisible(true);
 
         while (true) {
-            while (!gameIsOver) {
-                renderBoard();
-                if (this.game.isGameOver() || this.game.isGameWon()) {
-                    gameIsOver = true;
-                    break;
-                }
-            }
+            renderBoard();
         }
     }
 
     @Override
     public void keyTyped(KeyEvent e) {
         char key = e.getKeyChar();
-        if ("wasdop".indexOf(key) != -1) {
-            this.game.changeBoard(key);
+        if ("wasd".indexOf(key) != -1) {
+            this.game.move(key);
+        } else if (key == 'o') {
+            this.game.undo();
+        } else if (key == 'p') {
+            this.game.redo();
+        } else if (key == ']') {
+            this.game.setTestCondition();
         }
     }
 
@@ -89,13 +99,20 @@ public class GameFrame extends JFrame implements KeyListener {
                 // no idea why I need [column][row] and then [row][column]
             }
         }
-        this.endScreen.setIcon(this.hiddenImage);
-        if (this.game.isGameOver()) {
-            this.endScreen.setIcon(this.gameOverImage);
+        switch (this.game.getState()) {
+            case PLAYING:
+                this.endScreen.setIcon(this.hiddenImage);
+                this.gameIsOver = true;
+                break;
+            case GAMEOVER:
+                this.endScreen.setIcon(this.gameOverImage);
+                this.gameIsOver = true;
+                break;
+            case WON:
+                this.endScreen.setIcon(this.gameWonImage);
+                break;
         }
-        if (this.game.isGameWon()) {
-            this.endScreen.setIcon(this.gameWonImage);
-        }
+        this.currentScore.setText("Current Score: " + this.game.getScore());
     }
 
     private void intializeSprites() {
