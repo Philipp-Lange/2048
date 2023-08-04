@@ -58,15 +58,11 @@ public class Game {
     public void undo() {
         this.board = this.undoMove(this.history);
         this.score = this.undoScore(this.scoreHistory);
-        System.out.println("Board Index: " + this.historyIndex);
-        System.out.println("Score Index: " + this.scoreHistoryIndex);
     }
 
     public void redo() {
         this.board = this.redoMove(this.history);
         this.score = this.redoScore(this.scoreHistory);
-        System.out.println("Board Index: " + this.historyIndex);
-        System.out.println("Score Index: " + this.scoreHistoryIndex);
     }
 
     public State getState() {
@@ -84,8 +80,11 @@ public class Game {
         this.history.clear();
         this.scoreHistory.clear();
         this.score = 0;
-        this.historyIndex = 0;
-        this.scoreHistoryIndex = 0;
+        this.historyIndex = -1;
+        this.scoreHistoryIndex = -1;
+
+        addToBoardHistory(this.board);
+        addToScoreHistory(this.score);
     }
 
     public void setTestCondition() {

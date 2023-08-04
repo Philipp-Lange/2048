@@ -5,7 +5,6 @@ import java.util.Map;
 
 public class GameFrame extends JFrame implements KeyListener {
     private Game game;
-    private boolean gameIsOver;
     private Map<Integer, ImageIcon> sprites;
     private JLabel[][] tiles;
     private JLabel endScreen;
@@ -14,12 +13,13 @@ public class GameFrame extends JFrame implements KeyListener {
     private ImageIcon gameOverImage;
     private ImageIcon gameWonImage;
     private ImageIcon hiddenImage;
+    private ScoreHandler scoreHandler;
 
     public GameFrame(Game game) {
         this.game = game;
         this.tiles = new JLabel[4][4];
         this.sprites = new HashMap<Integer, ImageIcon>();
-        this.gameIsOver = false;
+        this.scoreHandler = new ScoreHandler();
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(495, 520);
@@ -31,7 +31,7 @@ public class GameFrame extends JFrame implements KeyListener {
         this.endScreen.setBounds(90, 90, 300, 300);
         this.add(this.endScreen);
 
-        this.highScore = new JLabel("High Score: 133742069");
+        this.highScore = new JLabel("High Score: " + this.scoreHandler.getHighScore(this.game));
         this.highScore.setBounds(25, 5, 150, 15);
         this.add(this.highScore);
 
@@ -45,6 +45,9 @@ public class GameFrame extends JFrame implements KeyListener {
 
         while (true) {
             renderBoard();
+            if (this.game.getState() != State.PLAYING) {
+                this.scoreHandler.saveScores(this.game);
+            }
         }
     }
 
@@ -64,14 +67,12 @@ public class GameFrame extends JFrame implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        switch (e.getKeyCode()) {
-            case 32:
-                if (!this.gameIsOver) {
-                    break;
-                }
-                this.game.reset();
-                this.gameIsOver = false;
-                break;
+        if (e.getKeyCode() == 32) {
+            if (this.game.getState() == State.PLAYING) {
+                return;
+            }
+            this.game.reset();
+
         }
     }
 
@@ -83,8 +84,8 @@ public class GameFrame extends JFrame implements KeyListener {
         for (int row = 0; row < this.tiles.length; row++) {
             for (int column = 0; column < this.tiles.length; column++) {
                 this.tiles[row][column] = new JLabel();
-                int xBound = 25 + row * 110;
-                int yBound = 25 + column * 110;
+                int yBound = 25 + row * 110;
+                int xBound = 25 + column * 110;
                 this.tiles[row][column].setBounds(xBound, yBound, 100, 100);
                 this.add(this.tiles[row][column]);
             }
@@ -95,24 +96,22 @@ public class GameFrame extends JFrame implements KeyListener {
         int[][] board = this.game.getBoard();
         for (int row = 0; row < board.length; row++) {
             for (int column = 0; column < board.length; column++) {
-                this.tiles[column][row].setIcon(this.sprites.get(board[row][column]));
-                // no idea why I need [column][row] and then [row][column]
+                this.tiles[row][column].setIcon(this.sprites.get(board[row][column]));
             }
         }
         switch (this.game.getState()) {
             case PLAYING:
                 this.endScreen.setIcon(this.hiddenImage);
-                this.gameIsOver = true;
                 break;
             case GAMEOVER:
                 this.endScreen.setIcon(this.gameOverImage);
-                this.gameIsOver = true;
                 break;
             case WON:
                 this.endScreen.setIcon(this.gameWonImage);
                 break;
         }
-        this.currentScore.setText("Current Score: " + this.game.getScore());
+        this.currentScore.setText("Current Score: " + this.scoreHandler.getCurrentScore(this.game));
+        this.highScore.setText("High Score: " + this.scoreHandler.getHighScore(this.game));
     }
 
     private void intializeSprites() {
