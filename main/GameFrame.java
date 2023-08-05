@@ -1,3 +1,5 @@
+package main;
+
 import javax.swing.*;
 import java.awt.event.*;
 import java.util.HashMap;
@@ -45,9 +47,6 @@ public class GameFrame extends JFrame implements KeyListener {
 
         while (true) {
             renderBoard();
-            if (this.game.getState() != State.PLAYING) {
-                this.scoreHandler.saveScores(this.game);
-            }
         }
     }
 
@@ -71,6 +70,7 @@ public class GameFrame extends JFrame implements KeyListener {
             if (this.game.getState() == State.PLAYING) {
                 return;
             }
+            this.scoreHandler.saveScores(this.game);
             this.game.reset();
 
         }

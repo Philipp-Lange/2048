@@ -1,3 +1,5 @@
+package main;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -10,37 +12,17 @@ public class GameBoard {
     private Random rng;
 
     public GameBoard() {
-        this.values = setValues();
+        this.values = initialiseValues();
         this.rng = new Random();
     }
 
     public GameBoard(GameBoard board) {
-        this.values = setValues(board);
+        this.values = setValues(board.getValues());
         this.rng = new Random();
     }
 
     public int[][] getValues() {
         return this.values;
-    }
-
-    public int[][] setValues() {
-        int[][] newValues = new int[4][4];
-        for (int row = 0; row < newValues.length; row++) {
-            for (int column = 0; column < newValues.length; column++) {
-                newValues[row][column] = 0;
-            }
-        }
-        return newValues;
-    }
-
-    public int[][] setValues(GameBoard board) {
-        int[][] newValues = new int[4][4];
-        for (int row = 0; row < newValues.length; row++) {
-            for (int column = 0; column < newValues.length; column++) {
-                newValues[row][column] = board.getValues()[row][column];
-            }
-        }
-        return newValues;
     }
 
     public int moveGameBoard(String direction) {
@@ -106,6 +88,26 @@ public class GameBoard {
         if (!Arrays.deepEquals(values, other.values))
             return false;
         return true;
+    }
+
+    private int[][] initialiseValues() {
+        int[][] newValues = new int[4][4];
+        for (int row = 0; row < newValues.length; row++) {
+            for (int column = 0; column < newValues.length; column++) {
+                newValues[row][column] = 0;
+            }
+        }
+        return newValues;
+    }
+
+    private int[][] setValues(int[][] boardValues) {
+        int[][] newValues = new int[4][4];
+        for (int row = 0; row < newValues.length; row++) {
+            for (int column = 0; column < newValues.length; column++) {
+                newValues[row][column] = boardValues[row][column];
+            }
+        }
+        return newValues;
     }
 
     private int[] getRandomEmptySpace() {

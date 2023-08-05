@@ -1,3 +1,5 @@
+package main;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -13,7 +15,7 @@ public class ScoreHandler {
     private String filePath;
 
     public ScoreHandler() {
-        this.filePath = "HighScores.txt";
+        this.filePath = "main//HighScores.txt";
         this.scores = readScores();
     }
 
