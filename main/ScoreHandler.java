@@ -14,8 +14,8 @@ public class ScoreHandler {
     private List<Integer> scores;
     private String filePath;
 
-    public ScoreHandler() {
-        this.filePath = "main//HighScores.txt";
+    public ScoreHandler(String filepath) {
+        this.filePath = filepath;
         this.scores = readScores();
     }
 

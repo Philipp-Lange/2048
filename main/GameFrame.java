@@ -21,7 +21,7 @@ public class GameFrame extends JFrame implements KeyListener {
         this.game = game;
         this.tiles = new JLabel[4][4];
         this.sprites = new HashMap<Integer, ImageIcon>();
-        this.scoreHandler = new ScoreHandler();
+        this.scoreHandler = new ScoreHandler("main/HighScores.txt");
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(495, 520);
@@ -59,8 +59,6 @@ public class GameFrame extends JFrame implements KeyListener {
             this.game.undo();
         } else if (key == 'p') {
             this.game.redo();
-        } else if (key == ']') {
-            this.game.setTestCondition();
         }
     }
 
