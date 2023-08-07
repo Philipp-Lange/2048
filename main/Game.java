@@ -89,15 +89,6 @@ public class Game {
         addToScoreHistory(this.score);
     }
 
-    public void setTestCondition() {
-        int[][] testBoard = { { 4, 8, 4, 2 }, { 16, 64, 128, 8 }, { 2, 16, 64, 16 }, { 2, 4, 8, 2 } };
-        for (int row = 0; row < 4; row++) {
-            for (int column = 0; column < 4; column++) {
-                this.board.getValues()[row][column] = testBoard[row][column];
-            }
-        }
-    }
-
     private void addToBoardHistory(GameBoard newBoard) {
         int historySize = this.history.size() - 1;
         while (this.historyIndex < historySize) {
